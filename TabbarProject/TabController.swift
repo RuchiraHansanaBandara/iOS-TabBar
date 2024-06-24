@@ -25,20 +25,27 @@ class TabController: UITabBarController {
         
         let home = self.createNav(with: "Home", and: UIImage(systemName: "house"), vc: HomeController(), barColor: .systemRed)
         let history = self.createNav(with: "History", and: UIImage(systemName: "clock"), vc: HistoryController(), barColor: .systemGreen)
-        let workout = self.createNav(with: "Workout", and: UIImage(systemName: "person"), vc: WorkoutController(), barColor: .systemBlue)
+        let workout = self.createNav(with: "Workout", and: UIImage(systemName: "person"), vc: WorkoutController(), barColor: .systemBlue, hideTabBar: true)
         let exercise = self.createNav(with: "Exercise", and: UIImage(systemName: "cloud.snow"), vc: ExerciseController(), barColor: .systemYellow)
         
         self.setViewControllers([home, history, workout, exercise], animated: true)
     }
     
-    private func createNav(with title: String, and image: UIImage?, vc: UIViewController, barColor: UIColor) -> UINavigationController {
+    private func createNav(with title: String, and image: UIImage?, vc: UIViewController, barColor: UIColor, hideTabBar: Bool = false) -> UINavigationController {
         let nav = UINavigationController(rootViewController: vc)
         
         nav.tabBarItem.title = title
         nav.tabBarItem.image = image
         
         nav.viewControllers.first?.navigationItem.title = title + " Controller"
-        nav.viewControllers.first?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Button", style: .plain, target: nil, action: nil)
+        
+        // Add the right bar button item with an action to navigate back to the home view controller
+        nav.viewControllers.first?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Home", style: .plain, target: self, action: #selector(navigateToHome))
+        
+        // Hide the tab bar for this view controller if specified
+        if hideTabBar {
+            vc.hidesBottomBarWhenPushed = true
+        }
         
         // Customize the navigation bar appearance
         let appearance = UINavigationBarAppearance()
@@ -53,6 +60,13 @@ class TabController: UITabBarController {
         nav.navigationBar.tintColor = .white // Bar button item color
         
         return nav
+    }
+    
+    @objc private func navigateToHome() {
+        self.selectedIndex = 0
+        if let navController = self.selectedViewController as? UINavigationController {
+            navController.popToRootViewController(animated: true)
+        }
     }
     
     private func addTopShadowToTabBar() {
